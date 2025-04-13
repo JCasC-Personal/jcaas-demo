@@ -1,5 +1,3 @@
-@Grab(group='org.yaml', module='snakeyaml', version='1.28') // Add this line to grab the SnakeYAML library
-
 import org.yaml.snakeyaml.DumperOptions
 import org.yaml.snakeyaml.Yaml
 
@@ -12,18 +10,24 @@ jobConfigsDir.eachFileMatch(~/.*\.ya?ml/) { file ->
     def jobConfig = yaml.load(new FileReader(file))
     
     jobConfig.jobs.each { job ->
-        pipelineJob(job.name) {
-            definition {
-                cpsScm {
-                    scm {
-                        git {
-                            remote {
-                                url(job.repo)
-                            }
-                            branches(job.branch)
-                        }
-                        scriptPath(job.script_path)
+        // Define the pipeline job with the correct structure
+        job(job.name) { // Use the standard job() method in Job DSL
+            description("This is the job for ${job.name}")
+            scm {
+                git {
+                    remote {
+                        url(job.repo)
                     }
+                    branches(job.branch)
+                }
+            }
+            triggers {
+                // Define any triggers here (optional)
+            }
+            steps {
+                // This assumes you're using pipeline as code. If you need to define pipeline logic here, you can specify steps.
+                pipeline {
+                    scriptPath(job.script_path)
                 }
             }
         }
