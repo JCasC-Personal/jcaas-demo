@@ -1,13 +1,17 @@
-import groovy.yaml.YamlSlurper
+@Grab(group='org.yaml', module='snakeyaml', version='1.28') // Add this line to grab the SnakeYAML library
+
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.Yaml
 
 def jobConfigsDir = new File("${WORKSPACE}/seed-jobs/config/appservice")
 jobConfigsDir.eachFileMatch(~/.*\.ya?ml/) { file ->
     println "Processing YAML: ${file.name}"
     
-    // Use YamlSlurper to parse the YAML file
-    def yaml = new YamlSlurper().parse(file)
+    // Create Yaml parser
+    def yaml = new Yaml()
+    def jobConfig = yaml.load(new FileReader(file))
     
-    yaml.jobs.each { job ->
+    jobConfig.jobs.each { job ->
         pipelineJob(job.name) {
             definition {
                 cpsScm {
