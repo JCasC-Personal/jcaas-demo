@@ -22,8 +22,8 @@ jobConfigsDir.eachFileMatch(~/.*\.ya?ml/) { file ->
             println "Job Branch: ${job.branch}"
             println "Job Script Path: ${job.script_path}"
 
-            // Define the job correctly using the 'job' method from Job DSL
-            job(job.name) { 
+            // Directly define the job using pipelineJob
+            pipelineJob(job.name) { 
                 description("This is the job for ${job.name}")
                 scm {
                     git {
@@ -36,11 +36,16 @@ jobConfigsDir.eachFileMatch(~/.*\.ya?ml/) { file ->
                 triggers {
                     // Define any triggers here (optional)
                 }
-                steps {
-                    // Log the script path being used in the pipeline step
-                    println "Using script path for pipeline: ${job.script_path}"
-                    
-                    pipeline {
+                definition {
+                    cpsScm {
+                        scm {
+                            git {
+                                remote {
+                                    url(job.repo)
+                                }
+                                branches(job.branch)
+                            }
+                        }
                         scriptPath(job.script_path)
                     }
                 }
