@@ -1,5 +1,5 @@
 jobs:
-  - name: "sample-job-3"
+  - name: "sample-job-2"
     repo: "https://github.com/JCasC-Personal/jcaas-demo.git"
     branch: "main"
     script_path: "app-job-2/Jenkinsfile"
