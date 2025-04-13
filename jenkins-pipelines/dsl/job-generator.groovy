@@ -1,27 +1,26 @@
-import groovy.yaml.YamlSlurper
+import org.yaml.snakeyaml.Yaml
+import java.nio.file.Files
+import java.nio.file.Paths
 
-def configDir = new File("seed-jobs/config/appservice")
-def yamlParser = new YamlSlurper()
+def yaml = new Yaml()
+def jobFiles = new File("/var/jenkins_home/seed-jobs/config/appservice").listFiles()
 
-configDir.eachFileMatch(~/.*\.ya?ml/) { file ->
-    def config = yamlParser.parse(file)
-    config.jobs.each { jobDef ->
-        def jobName = jobDef.name
-        def repo = jobDef.repo
-        def branch = jobDef.branch
-        def scriptPath = jobDef.script_path
+jobFiles.each { file ->
+    def config = yaml.load(Files.newInputStream(Paths.get(file.getAbsolutePath())))
 
-        pipelineJob(jobName) {
+    config.jobs.each { job ->
+        job(job.name) {
+            description("Generated job from YAML")
             definition {
                 cpsScm {
                     scm {
                         git {
                             remote {
-                                url(repo)
+                                url(job.repo)
                             }
-                            branches(branch)
+                            branch(job.branch)
                         }
-                        scriptPath(scriptPath)
+                        scriptPath(job.script_path)
                     }
                 }
             }
