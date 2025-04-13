@@ -1,16 +1,9 @@
-import org.yaml.snakeyaml.Yaml
-import java.nio.file.Files
-import java.nio.file.Paths
+import groovy.yaml.YamlSlurper
 
-def yaml = new Yaml()
-def jobFiles = new File("/var/jenkins_home/seed-jobs/config/appservice").listFiles()
-
-jobFiles.each { file ->
-    def config = yaml.load(Files.newInputStream(Paths.get(file.getAbsolutePath())))
-
-    config.jobs.each { job ->
-        job(job.name) {
-            description("Generated job from YAML")
+def generateJobFromYaml(File yamlFile) {
+    def yaml = new YamlSlurper().parse(yamlFile)
+    yaml.jobs.each { job ->
+        pipelineJob(job.name) {
             definition {
                 cpsScm {
                     scm {
@@ -18,7 +11,7 @@ jobFiles.each { file ->
                             remote {
                                 url(job.repo)
                             }
-                            branch(job.branch)
+                            branches(job.branch)
                         }
                         scriptPath(job.script_path)
                     }
@@ -27,3 +20,4 @@ jobFiles.each { file ->
         }
     }
 }
+return this
