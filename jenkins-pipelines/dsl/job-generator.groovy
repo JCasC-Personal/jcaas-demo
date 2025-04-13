@@ -1,11 +1,13 @@
-import groovy.json.JsonSlurper
+import groovy.yaml.YamlSlurper
 
 def jobConfigsDir = new File("${WORKSPACE}/seed-jobs/config/appservice")
 jobConfigsDir.eachFileMatch(~/.*\.ya?ml/) { file ->
     println "Processing YAML: ${file.name}"
-    def jobConfig = readYaml file: file.path
-
-    jobConfig.jobs.each { job ->
+    
+    // Use YamlSlurper to parse the YAML file
+    def yaml = new YamlSlurper().parse(file)
+    
+    yaml.jobs.each { job ->
         pipelineJob(job.name) {
             definition {
                 cpsScm {
