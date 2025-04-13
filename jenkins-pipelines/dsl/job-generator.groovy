@@ -1,5 +1,9 @@
-def generateJobFromYaml(File yamlFile) {
-    def jobConfig = readYaml file: yamlFile.path
+import groovy.json.JsonSlurper
+
+def jobConfigsDir = new File("${WORKSPACE}/seed-jobs/config/appservice")
+jobConfigsDir.eachFileMatch(~/.*\.ya?ml/) { file ->
+    println "Processing YAML: ${file.name}"
+    def jobConfig = readYaml file: file.path
 
     jobConfig.jobs.each { job ->
         pipelineJob(job.name) {
@@ -19,4 +23,3 @@ def generateJobFromYaml(File yamlFile) {
         }
     }
 }
-return this

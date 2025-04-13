@@ -1,0 +1,16 @@
+# seed-jobs/config/appservice/all-jobs.yaml
+jobs:
+  - name: "sample-job-1"
+    repo: "https://github.com/JCasC-Personal/jcaas-demo.git"
+    branch: "main"
+    script_path: "app-job-1/Jenkinsfile"
+
+  - name: "sample-job-2"
+    repo: "https://github.com/JCasC-Personal/jcaas-demo.git"
+    branch: "main"
+    script_path: "app-job-2/Jenkinsfile"
+
+  - name: "sample-job-3"
+    repo: "https://github.com/JCasC-Personal/jcaas-demo.git"
+    branch: "main"
+    script_path: "app-job-3/Jenkinsfile"
