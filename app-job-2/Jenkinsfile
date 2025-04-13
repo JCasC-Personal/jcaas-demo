@@ -1,0 +1,43 @@
+@Library('jenkins-shared-library') _
+
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENV', choices: getEnvList(), description: 'Choose environment')
+        choice(name: 'SERVERS', choices: getServerList(), description: 'Choose server')
+        string(name: 'VERSION', defaultValue: '', description: 'Build version')
+        string(name: 'BRANCH', defaultValue: 'main', description: 'Git branch to build')
+        booleanParam(name: 'DEBUG', defaultValue: false, description: 'Enable debug')
+    }
+
+    stages {
+        stage('Shell Script') {
+            steps {
+                sh 'echo "Running Shell commands for ${params.ENV} on ${params.SERVERS}"'
+            }
+        }
+        stage('Python Script') {
+            steps {
+                sh 'python3 scripts/deploy.py --env ${params.ENV} --servers ${params.SERVERS} --version ${params.VERSION} --branch ${params.BRANCH}' 
+                script {
+                    if (params.DEBUG) {
+                        sh 'echo "Debug mode is enabled"'
+                    }
+                }
+                script {
+                    if (params.CLEAN) {
+                        sh 'echo "Cleaning workspace"'
+                        cleanWs()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            updateBuildMetadata(params.ENV)
+        }
+    }
+}
