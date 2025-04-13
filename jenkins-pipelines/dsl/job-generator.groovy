@@ -1,8 +1,7 @@
-import groovy.yaml.YamlSlurper
-
 def generateJobFromYaml(File yamlFile) {
-    def yaml = new YamlSlurper().parse(yamlFile)
-    yaml.jobs.each { job ->
+    def jobConfig = readYaml file: yamlFile.path
+
+    jobConfig.jobs.each { job ->
         pipelineJob(job.name) {
             definition {
                 cpsScm {
